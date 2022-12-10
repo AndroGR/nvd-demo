@@ -1,0 +1,3 @@
+[submodule "nvdialog"]
+	path = nvdialog
+	url = https://github.com/AndroGR/nvdialog/
