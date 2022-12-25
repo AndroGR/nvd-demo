@@ -19,12 +19,6 @@
 #ifndef __nvd_demo_h__
 #define __nvd_demo_h__ 1
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <nvdialog/nvdialog.h>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 #define NVD_WINDOW_WIDTH  (800)
 #define NVD_WINDOW_HEIGHT (600)
 
@@ -33,9 +27,9 @@
  * wrap around them and are then called from main().
  */
 void app_basic_dialog();
-void app_threaded_dialog();
-void app_about_dialog();
 void app_question();
-
+void app_file_picker();
+void app_about();
+void app_notification();
 
 #endif /* __nvd_demo_h__ */

@@ -21,16 +21,9 @@
 #warning "Will not create multithreaded dialogs, as the system does not support pthread."
 #endif /* __linux__ */
 
-static void __dlg_pthread(void) {
-        puts("thread2");
-        NvdDialogBox* dialog = nvd_dialog_box_new("Multithreaded dialog",
-                                                  "As you can see, unlike the previous dialogs, NvDialog"
-                                                  "can also make use of multiple threads to run independently of"
-                                                  "the main application thread, which may be what you want sometimes.",
-                                                  NVD_DIALOG_SIMPLE);
-        nvd_show_dialog(dialog);
-        nvd_free_object(dialog);
-}
+#include <nvdialog/nvdialog.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void app_basic_dialog() {
         NvdDialogBox* dialog = nvd_dialog_box_new("Welcome to NvDialog",
@@ -66,6 +59,7 @@ void app_question() {
                 title   = "Won't terminate.";
                 message = "The application will continue running.";
                 break;
+        default: break;
         }
 
         NvdDialogBox* dlg = nvd_dialog_box_new(title, message, NVD_DIALOG_SIMPLE);
@@ -73,12 +67,51 @@ void app_question() {
 
         nvd_free_object(dlg);
         nvd_free_object(dialog);
-        exit(EXIT_SUCCESS);
+
+        if (rep == NVD_REPLY_OK) exit(EXIT_SUCCESS);
 }
 
-void app_threaded_dialog() {
-        #if defined(__linux__) || defined(__linux) || defined(__gnu_linux__)
-        pthread_t thread = 0;
-        pthread_create(&thread, NULL, __dlg_pthread, NULL);
-        #endif /* __linux__ */
+void app_about() {
+        NvdAboutDialog* dialog = nvd_about_dialog_new("Nvd Demo",
+                                                      "nvd-demo is a simple application that"
+                                                      "demonstrates the capabilities of NvDialog.",
+                                                      NULL);
+        nvd_about_dialog_set_license_link(dialog, "https://github.com/AndroGR/nvd-demo/blob/master/COPYING", "License");
+        nvd_about_dialog_set_version(dialog, "0.1.0");
+
+        nvd_show_about_dialog(dialog);
+        nvd_free_object(dialog);
+}
+
+void app_notification() {
+        nvd_set_application_name("nvd-demo"); // The notification will show it
+        const char* msg = "NvDialog supports notifications as well. While they aren't necessarily dialogs, "
+        "it can easily become a hassle to set them up. Windows is the exception here; It isn't supported yet "
+        "because it's a pretty complicated process to do so. It will be implemented in newer versions though.";
+        NvdNotification* notification = nvd_notification_new("Notifications Supported",
+                                                              msg, NVD_NOTIFICATION_SIMPLE);
+        nvd_send_notification(notification);
+        //nvd_delete_notification(notification);
+}
+
+void app_file_picker() {
+        const char   * buffer;
+        NvdFileDialog* dlg = nvd_open_file_dialog_new("Choose A File", NULL);
+        nvd_get_file_location(dlg, &buffer);
+
+        if (buffer) {
+                char formatted[1024];
+                sprintf(formatted, "You have selected the following file: %s. This is a very nice file!", buffer);
+                NvdDialogBox* dialog = nvd_dialog_box_new("Chose A File!",
+                                                          formatted,
+                                                          NVD_DIALOG_SIMPLE);
+                nvd_show_dialog(dialog);
+                nvd_free_object(dialog);
+        } else {
+                NvdDialogBox* dialog = nvd_dialog_box_new("Didn't choose a file...",
+                                                          "NvDialog determined that you didn't select a file. If that's wrong, please open an issue :)",
+                                                          NVD_DIALOG_ERROR);
+                nvd_show_dialog(dialog);
+                nvd_free_object(dialog);
+        }
 }

@@ -15,7 +15,40 @@
  ************************************************************************/
 
 #include "nvd_demo.h"
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <nvdialog/nvdialog.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+#include <pthread.h>
+
+static void __timer(pthread_t self) {
+        /* Waiting for 3 seconds first... */
+        int msec = 0, trigger = 1000;
+        clock_t before = clock();
+
+        do {
+                clock_t difference = clock() - before;
+                msec = difference * 1000 / CLOCKS_PER_SEC;
+
+                printf("Waiting for: %d msec\n", msec);
+        } while ( msec < trigger );
+
+        app_basic_dialog();
+        app_question();
+        //app_about();
+        app_notification();
+        app_file_picker();
+        pthread_cancel(self);
+}
+
+static void dialogs() {
+        pthread_t thread;
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+        pthread_create(&thread, NULL, (void*)__timer, thread);
+}
 
 int main(int argc, char **argv) {
         int result = nvd_init(argv[0]);
@@ -71,12 +104,10 @@ int main(int argc, char **argv) {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 if (!dialog_shown) {
-                        app_basic_dialog();
-                        app_question();
+                        dialogs();
                         dialog_shown = true;
                 }
-
-                app_threaded_dialog();
+                
                 glfwSwapBuffers(window);
                 glfwPollEvents();
         }
