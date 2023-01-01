@@ -32,8 +32,6 @@ static void __timer(pthread_t self) {
         do {
                 clock_t difference = clock() - before;
                 msec = difference * 1000 / CLOCKS_PER_SEC;
-
-                printf("Waiting for: %d msec\n", msec);
         } while ( msec < trigger );
 
         app_basic_dialog();
@@ -41,13 +39,26 @@ static void __timer(pthread_t self) {
         //app_about();
         app_notification();
         app_file_picker();
-        pthread_cancel(self);
+        
+        NvdDialogBox* exit_dialog = nvd_dialog_box_new("Exiting!",
+                                                       "The demo ends here.\n"
+                                                       "If you wish to check out the source code\n"
+                                                       "or some examples, you can easily see the NvDialog\n"
+                                                       "repository at https://github.com/AndroGR/nvdialog\n"
+                                                       "and the examples under the source tree.\n"
+                                                       "\n"
+                                                       "Goodbye!",
+                                                       NVD_DIALOG_SIMPLE);
+        nvd_show_dialog(exit_dialog);
+        nvd_free_object(exit_dialog);
+        
+        exit(EXIT_SUCCESS);
 }
 
 static void dialogs() {
         pthread_t thread;
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-        pthread_create(&thread, NULL, (void*)__timer, thread);
+        pthread_create(&thread, NULL, (void*)__timer, (void*)thread);
 }
 
 int main(int argc, char **argv) {
