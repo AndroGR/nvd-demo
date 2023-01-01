@@ -19,8 +19,8 @@
 #ifndef __nvd_demo_h__
 #define __nvd_demo_h__ 1
 
-#define NVD_WINDOW_WIDTH  (800)
-#define NVD_WINDOW_HEIGHT (600)
+#define NVD_WINDOW_WIDTH  (1024)
+#define NVD_WINDOW_HEIGHT (768)
 
 /* 
  * All dialogs that will be created. These functions
